@@ -1,4 +1,10 @@
-import React, { useState, useContext, useMemo, useCallback } from "react";
+import React, {
+	useState,
+	useContext,
+	useMemo,
+	useCallback,
+	useEffect,
+} from "react";
 import {
 	View,
 	Text,
@@ -15,26 +21,41 @@ import {
 	CheckCircle,
 	X,
 	ChevronRight,
+	ArrowLeft,
 } from "lucide-react-native";
+import { useRouter } from "expo-router";
 
 // Import components
 import Header from "./components/Header";
 import NavigationBar from "./components/NavigationBar";
-import { ThemeContext } from "./preferences";
-
-interface Notification {
-	id: string;
-	type: "alert" | "info" | "success";
-	title: string;
-	message: string;
-	time: string;
-	isRead: boolean;
-	actionable?: boolean;
-}
+import { ThemeContext } from "./ThemeContext";
+import NotificationService, {
+	NotificationData,
+} from "./components/NotificationService";
+import SoundService from "./components/SoundService";
 
 function NotificationsScreen() {
 	const insets = useSafeAreaInsets();
 	const { isDarkMode } = useContext(ThemeContext);
+	const router = useRouter();
+	const [notifications, setNotifications] = useState<NotificationData[]>([]);
+	const [isLoading, setIsLoading] = useState(true);
+
+	// Load notifications on mount
+	useEffect(() => {
+		const loadNotifications = async () => {
+			try {
+				const notifs = await NotificationService.getNotifications();
+				setNotifications(notifs);
+			} catch (error) {
+				console.error("Failed to load notifications:", error);
+			} finally {
+				setIsLoading(false);
+			}
+		};
+
+		loadNotifications();
+	}, []);
 
 	// Define theme colors as memoized values to prevent recalculations
 	const themeColors = useMemo(
@@ -65,72 +86,49 @@ function NotificationsScreen() {
 		[isDarkMode]
 	);
 
-	const [notifications, setNotifications] = useState<Notification[]>([
-		{
-			id: "1",
-			type: "alert",
-			title: "Parking Time Expiring",
-			message: "Your parking in Slot A12 will expire in 15 minutes.",
-			time: "15 min ago",
-			isRead: false,
-			actionable: true,
-		},
-		{
-			id: "2",
-			type: "info",
-			title: "Preferred Spot Available",
-			message: "A parking spot is now available in your preferred Section B.",
-			time: "1 hour ago",
-			isRead: true,
-			actionable: true,
-		},
-		{
-			id: "3",
-			type: "success",
-			title: "Parking Successful",
-			message: "Your vehicle has been properly parked in Slot C5.",
-			time: "Yesterday",
-			isRead: true,
-		},
-		{
-			id: "4",
-			type: "alert",
-			title: "Vehicle Misaligned",
-			message:
-				"Your vehicle appears to be misaligned in the parking slot. Please adjust.",
-			time: "2 days ago",
-			isRead: true,
-		},
-		{
-			id: "5",
-			type: "info",
-			title: "New Feature Available",
-			message:
-				"Try our new voice guidance feature for easier parking alignment.",
-			time: "3 days ago",
-			isRead: true,
-		},
-	]);
-
 	// Memoize handlers to prevent rerenders
-	const markAsRead = useCallback((id: string) => {
-		setNotifications((prev) =>
-			prev.map((notification) =>
-				notification.id === id
-					? { ...notification, isRead: true }
-					: notification
-			)
-		);
+	const markAsRead = useCallback(async (id: string) => {
+		try {
+			await NotificationService.markAsRead(id);
+			// Update local state
+			setNotifications((prev) =>
+				prev.map((notification) =>
+					notification.id === id
+						? { ...notification, isRead: true }
+						: notification
+				)
+			);
+			// Play click sound
+			await SoundService.playSound("click");
+		} catch (error) {
+			console.error("Failed to mark notification as read:", error);
+		}
 	}, []);
 
-	const deleteNotification = useCallback((id: string) => {
-		setNotifications((prev) =>
-			prev.filter((notification) => notification.id !== id)
-		);
+	const deleteNotification = useCallback(async (id: string) => {
+		try {
+			await NotificationService.deleteNotification(id);
+			// Update local state
+			setNotifications((prev) =>
+				prev.filter((notification) => notification.id !== id)
+			);
+			// Play click sound
+			await SoundService.playSound("click");
+		} catch (error) {
+			console.error("Failed to delete notification:", error);
+		}
 	}, []);
 
-	const markAllAsRead = useCallback(() => {
-		setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
+	const markAllAsRead = useCallback(async () => {
+		try {
+			await NotificationService.markAllAsRead();
+			// Update local state
+			setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
+			// Play click sound
+			await SoundService.playSound("click");
+		} catch (error) {
+			console.error("Failed to mark all notifications as read:", error);
+		}
 	}, []);
 
 	const getIconForType = useCallback(
@@ -161,7 +159,7 @@ function NotificationsScreen() {
 
 	// Create a memoized NotificationCard component
 	const NotificationCard = useCallback(
-		({ notification }: { notification: Notification }) => (
+		({ notification }: { notification: NotificationData }) => (
 			<View
 				className="mb-3 rounded-lg overflow-hidden"
 				style={{
@@ -210,7 +208,7 @@ function NotificationsScreen() {
 											marginLeft: 4,
 										}}
 									>
-										{notification.time}
+										{formatTime(new Date(notification.time))}
 									</Text>
 								</View>
 							</View>
@@ -255,6 +253,7 @@ function NotificationsScreen() {
 			getBackgroundForType,
 			getIconForType,
 			isDarkMode,
+			formatTime,
 		]
 	);
 
@@ -293,15 +292,55 @@ function NotificationsScreen() {
 
 	const unreadCount = notifications.filter((n) => !n.isRead).length;
 
+	// Handle back to home
+	const handleBackToHome = useCallback(() => {
+		router.push("/");
+	}, [router]);
+
+	// Format notification time to display string
+	const formatTime = useCallback((date: Date): string => {
+		const now = new Date();
+		const diff = now.getTime() - date.getTime();
+
+		// Less than a minute
+		if (diff < 60000) {
+			return "Just now";
+		}
+
+		// Less than an hour
+		if (diff < 3600000) {
+			const minutes = Math.floor(diff / 60000);
+			return `${minutes} min ago`;
+		}
+
+		// Less than a day
+		if (diff < 86400000) {
+			const hours = Math.floor(diff / 3600000);
+			return `${hours} hour${hours > 1 ? "s" : ""} ago`;
+		}
+
+		// Less than a week
+		if (diff < 604800000) {
+			const days = Math.floor(diff / 86400000);
+			if (days === 1) return "Yesterday";
+			return `${days} days ago`;
+		}
+
+		// Format as date
+		return date.toLocaleDateString();
+	}, []);
+
 	return (
 		<SafeAreaView
-			className="flex-1"
-			style={{ backgroundColor: themeColors.backgroundColor }}
+			style={{
+				flex: 1,
+				backgroundColor: themeColors.backgroundColor,
+			}}
 		>
 			<Header
 				title="Notifications"
-				onNotificationsPress={() => {}}
-				onSettingsPress={() => {}}
+				onNotificationsPress={handleBackToHome}
+				onSettingsPress={() => router.push("/preferences")}
 			/>
 
 			<ScrollView className="flex-1 px-4 py-4">

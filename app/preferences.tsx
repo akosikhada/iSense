@@ -15,8 +15,11 @@ import {
 	StatusBar,
 	useColorScheme,
 	Platform,
+	Alert,
+	ToastAndroid,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useRouter } from "expo-router";
 import {
 	Bell,
 	Vibrate,
@@ -27,49 +30,25 @@ import {
 	ChevronRight,
 	Settings,
 } from "lucide-react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // Import components
 import Header from "./components/Header";
 import NavigationBar from "./components/NavigationBar";
-
-// Create a theme context that can be used across the app
-export const ThemeContext = React.createContext({
-	isDarkMode: false,
-	toggleDarkMode: () => {},
-});
-
-// Create a custom ThemeProvider to optimize rendering
-export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
-	const deviceColorScheme = useColorScheme();
-	const [isDarkMode, setIsDarkMode] = useState(deviceColorScheme === "dark");
-
-	const toggleDarkMode = useCallback(() => {
-		setIsDarkMode((prev) => !prev);
-	}, []);
-
-	// Memoize context value to prevent unnecessary re-renders
-	const contextValue = useMemo(
-		() => ({
-			isDarkMode,
-			toggleDarkMode,
-		}),
-		[isDarkMode, toggleDarkMode]
-	);
-
-	return (
-		<ThemeContext.Provider value={contextValue}>
-			{children}
-		</ThemeContext.Provider>
-	);
-};
+import { ThemeContext } from "./ThemeContext";
+import SoundService from "./components/SoundService";
+import VibrationService from "./components/VibrationService";
+import NotificationService from "./components/NotificationService";
 
 export default function PreferencesScreen() {
 	const insets = useSafeAreaInsets();
 	const { isDarkMode, toggleDarkMode } = useContext(ThemeContext);
+	const router = useRouter();
 	const [notificationsEnabled, setNotificationsEnabled] = useState(true);
 	const [soundEnabled, setSoundEnabled] = useState(true);
 	const [vibrationEnabled, setVibrationEnabled] = useState(true);
 	const [preferredVehicleType, setPreferredVehicleType] = useState("standard");
+	const [isLoading, setIsLoading] = useState(true);
 
 	// Define theme-based colors as memoized values to prevent recalculations
 	const themeColors = useMemo(
@@ -83,6 +62,121 @@ export default function PreferencesScreen() {
 		}),
 		[isDarkMode]
 	);
+
+	// Load saved preferences when component mounts
+	useEffect(() => {
+		const loadPreferences = async () => {
+			try {
+				const storedNotifications = await AsyncStorage.getItem(
+					"notificationsEnabled"
+				);
+				const storedSound = await AsyncStorage.getItem("soundEnabled");
+				const storedVibration = await AsyncStorage.getItem("vibrationEnabled");
+				const storedVehicleType = await AsyncStorage.getItem(
+					"preferredVehicleType"
+				);
+
+				if (storedNotifications !== null) {
+					setNotificationsEnabled(storedNotifications === "true");
+				}
+				if (storedSound !== null) {
+					setSoundEnabled(storedSound === "true");
+				}
+				if (storedVibration !== null) {
+					setVibrationEnabled(storedVibration === "true");
+				}
+				if (storedVehicleType !== null) {
+					setPreferredVehicleType(storedVehicleType);
+				}
+			} catch (error) {
+				console.error("Failed to load preferences:", error);
+			} finally {
+				setIsLoading(false);
+			}
+		};
+
+		loadPreferences();
+	}, []);
+
+	// Handle notifications toggle
+	const handleNotificationsToggle = useCallback(async (value: boolean) => {
+		setNotificationsEnabled(value);
+		try {
+			await NotificationService.setNotificationsEnabled(value);
+			showToast(`Notifications ${value ? "enabled" : "disabled"}`);
+
+			// If notifications are turned off, disable sound and vibration too
+			if (!value) {
+				setSoundEnabled(false);
+				setVibrationEnabled(false);
+				await SoundService.setAudioEnabled(false);
+				await VibrationService.setVibrationEnabled(false);
+			}
+		} catch (error) {
+			console.error("Failed to save notification preference:", error);
+		}
+	}, []);
+
+	// Handle sound toggle
+	const handleSoundToggle = useCallback(
+		async (value: boolean) => {
+			setSoundEnabled(value);
+			try {
+				await SoundService.setAudioEnabled(value);
+				showToast(`Sound alerts ${value ? "enabled" : "disabled"}`);
+
+				// Play test sound when enabled
+				if (value) {
+					await SoundService.playSound("click");
+				}
+
+				// If sound is turned on, make sure notifications are also on
+				if (value && !notificationsEnabled) {
+					setNotificationsEnabled(true);
+					await NotificationService.setNotificationsEnabled(true);
+				}
+			} catch (error) {
+				console.error("Failed to save sound preference:", error);
+			}
+		},
+		[notificationsEnabled]
+	);
+
+	// Handle vibration toggle
+	const handleVibrationToggle = useCallback(
+		async (value: boolean) => {
+			setVibrationEnabled(value);
+			try {
+				await VibrationService.setVibrationEnabled(value);
+				showToast(`Vibration ${value ? "enabled" : "disabled"}`);
+
+				// Test vibration when enabled
+				if (value) {
+					await VibrationService.triggerVibration("click");
+				}
+
+				// If vibration is turned on, make sure notifications are also on
+				if (value && !notificationsEnabled) {
+					setNotificationsEnabled(true);
+					await NotificationService.setNotificationsEnabled(true);
+				}
+			} catch (error) {
+				console.error("Failed to save vibration preference:", error);
+			}
+		},
+		[notificationsEnabled]
+	);
+
+	// Helper function to show feedback
+	const showToast = (message: string) => {
+		if (Platform.OS === "android") {
+			ToastAndroid.show(message, ToastAndroid.SHORT);
+		} else {
+			// For iOS, use Alert instead of Toast
+			// This is simplified - in a real app you might want something less intrusive
+			Alert.alert("Settings Updated", message);
+		}
+	};
 
 	const PreferenceItem = React.memo(
 		({
@@ -140,6 +234,16 @@ export default function PreferencesScreen() {
 		)
 	);
 
+	// Handle navigation back to home
+	const handleBackToHome = useCallback(() => {
+		router.push("/");
+	}, [router]);
+
+	// Handle navigation to notifications
+	const handleGoToNotifications = useCallback(() => {
+		router.push("/notifications");
+	}, [router]);
+
 	return (
 		<SafeAreaView
 			className="flex-1"
@@ -147,8 +251,8 @@ export default function PreferencesScreen() {
 		>
 			<Header
 				title="Preferences"
-				onNotificationsPress={() => {}}
-				onSettingsPress={() => {}}
+				onNotificationsPress={handleGoToNotifications}
+				onSettingsPress={handleBackToHome}
 			/>
 
 			<ScrollView className="flex-1 px-4 py-6">
@@ -165,7 +269,7 @@ export default function PreferencesScreen() {
 					description="Receive alerts about parking availability"
 					toggle={true}
 					value={notificationsEnabled}
-					onValueChange={setNotificationsEnabled}
+					onValueChange={handleNotificationsToggle}
 				/>
 
 				<PreferenceItem
@@ -174,7 +278,7 @@ export default function PreferencesScreen() {
 					description="Play audio guidance during parking"
 					toggle={true}
 					value={soundEnabled}
-					onValueChange={setSoundEnabled}
+					onValueChange={handleSoundToggle}
 				/>
 
 				<PreferenceItem
@@ -183,7 +287,7 @@ export default function PreferencesScreen() {
 					description="Vibrate phone for alignment feedback"
 					toggle={true}
 					value={vibrationEnabled}
-					onValueChange={setVibrationEnabled}
+					onValueChange={handleVibrationToggle}
 				/>
 
 				<PreferenceItem
@@ -285,7 +389,8 @@ export default function PreferencesScreen() {
 				<View className="h-20" />
 			</ScrollView>
 
-			<NavigationBar activeTab="preferences" />
+			{/* Navigation Bar */}
+			<NavigationBar activeTab="settings" />
 		</SafeAreaView>
 	);
 }

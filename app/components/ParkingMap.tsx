@@ -16,7 +16,7 @@ import {
 } from "lucide-react-native";
 import ParkingSlot from "./ParkingSlot";
 import SlotDetailModal from "./SlotDetailModal";
-import { ThemeContext } from "../preferences";
+import { ThemeContext } from "../ThemeContext";
 
 interface ParkingMapProps {
 	onSlotSelect?: (slotId: string) => void;
@@ -215,165 +215,329 @@ const ParkingMap = ({
 
 	return (
 		<View className="flex-1" style={{ backgroundColor }}>
-			{/* Floor and Section Selector */}
+			{/* Floor Selector - Redesigned */}
 			<View
-				className="flex-row justify-between items-center px-4 py-2 border-b"
+				className="px-4 py-3 border-b"
 				style={{ backgroundColor: cardBackgroundColor, borderColor }}
 			>
+				<Text
+					className="text-sm font-medium mb-2"
+					style={{ color: textSecondaryColor }}
+				>
+					Select Floor
+				</Text>
 				<View className="flex-row">
 					<ScrollView horizontal showsHorizontalScrollIndicator={false}>
 						{floors.map((floor) => (
 							<TouchableOpacity
 								key={floor}
 								onPress={() => setSelectedFloor(floor)}
-								className="px-4 py-2 mr-2 rounded-full"
+								className="px-5 py-3 mr-3 rounded-xl"
 								style={{
 									backgroundColor:
-										selectedFloor === floor ? floorBgActive : floorBgInactive,
+										selectedFloor === floor
+											? isDarkMode
+												? "#1E40AF"
+												: "#3B82F6"
+											: isDarkMode
+											? "#374151"
+											: "#F3F4F6",
+									shadowOffset: {
+										width: 0,
+										height: selectedFloor === floor ? 2 : 0,
+									},
+									shadowOpacity: selectedFloor === floor ? 0.15 : 0,
+									shadowRadius: 3,
+									elevation: selectedFloor === floor ? 3 : 0,
+									borderWidth: 1,
+									borderColor:
+										selectedFloor === floor
+											? isDarkMode
+												? "#60A5FA"
+												: "#3B82F6"
+											: isDarkMode
+											? "#4B5563"
+											: "#E5E7EB",
 								}}
 							>
-								<Text
-									style={{
-										color:
-											selectedFloor === floor ? "#FFFFFF" : textSecondaryColor,
-									}}
-								>
-									{floor}
-								</Text>
+								<View className="flex-row items-center">
+									<View
+										className="w-6 h-6 rounded-full items-center justify-center mr-2"
+										style={{
+											backgroundColor:
+												selectedFloor === floor
+													? isDarkMode
+														? "#60A5FA"
+														: "rgba(255, 255, 255, 0.8)"
+													: isDarkMode
+													? "#4B5563"
+													: "rgba(59, 130, 246, 0.1)",
+										}}
+									>
+										<Text
+											style={{
+												color:
+													selectedFloor === floor
+														? isDarkMode
+															? "#1E3A8A"
+															: "#3B82F6"
+														: isDarkMode
+														? "#9CA3AF"
+														: "#6B7280",
+												fontSize: 12,
+												fontWeight: "bold",
+											}}
+										>
+											{floor === "Ground Floor" ? "G" : floor.slice(-1)}
+										</Text>
+									</View>
+									<Text
+										style={{
+											color:
+												selectedFloor === floor
+													? isDarkMode
+														? "#FFFFFF"
+														: "#FFFFFF"
+													: isDarkMode
+													? "#D1D5DB"
+													: "#6B7280",
+											fontWeight: selectedFloor === floor ? "600" : "500",
+										}}
+									>
+										{floor}
+									</Text>
+								</View>
 							</TouchableOpacity>
 						))}
 					</ScrollView>
 				</View>
-				<TouchableOpacity
-					onPress={handleRefresh}
-					className="p-2 rounded-full"
-					style={{ backgroundColor: floorBgInactive }}
-					disabled={refreshing}
-				>
-					<RefreshCw
-						size={20}
-						color={controlsIconColor}
-						style={{ opacity: refreshing ? 0.5 : 1 }}
-					/>
-				</TouchableOpacity>
 			</View>
 
-			{/* Section Selector */}
+			{/* Section Selector - Redesigned */}
 			<View
-				className="flex-row px-4 py-2 border-b"
+				className="px-4 py-3 border-b"
 				style={{ backgroundColor: cardBackgroundColor, borderColor }}
 			>
-				<ScrollView horizontal showsHorizontalScrollIndicator={false}>
-					{sections.map((section) => (
-						<TouchableOpacity
-							key={section}
-							onPress={() => setSelectedSection(section)}
-							className="px-4 py-1 mr-2 rounded-full"
+				<View className="flex-row justify-between items-center mb-2">
+					<Text
+						className="text-sm font-medium"
+						style={{ color: textSecondaryColor }}
+					>
+						Select Section
+					</Text>
+					<TouchableOpacity
+						onPress={handleRefresh}
+						className="p-2 rounded-full flex-row items-center"
+						style={{ backgroundColor: isDarkMode ? "#374151" : "#EFF6FF" }}
+						disabled={refreshing}
+					>
+						<RefreshCw
+							size={16}
+							color={isDarkMode ? "#60A5FA" : "#3B82F6"}
+							style={{ opacity: refreshing ? 0.5 : 1, marginRight: 4 }}
+						/>
+						<Text
 							style={{
-								backgroundColor:
-									selectedSection === section
-										? sectionBgActive
-										: sectionBgInactive,
-								borderWidth: selectedSection === section ? 1 : 0,
-								borderColor: sectionBorderActive,
+								color: isDarkMode ? "#60A5FA" : "#3B82F6",
+								fontSize: 12,
 							}}
 						>
-							<Text
+							Refresh
+						</Text>
+					</TouchableOpacity>
+				</View>
+				<View className="flex-row">
+					<ScrollView horizontal showsHorizontalScrollIndicator={false}>
+						{sections.map((section) => (
+							<TouchableOpacity
+								key={section}
+								onPress={() => setSelectedSection(section)}
+								className="mr-3 rounded-lg overflow-hidden"
 								style={{
-									color:
+									borderWidth: 1,
+									borderColor:
 										selectedSection === section
-											? filterTextColor
-											: textSecondaryColor,
+											? isDarkMode
+												? "#60A5FA"
+												: "#3B82F6"
+											: isDarkMode
+											? "#4B5563"
+											: "#E5E7EB",
 								}}
 							>
-								{section}
-							</Text>
-						</TouchableOpacity>
-					))}
-				</ScrollView>
+								<View
+									className="px-4 py-2"
+									style={{
+										backgroundColor:
+											selectedSection === section
+												? isDarkMode
+													? "rgba(30, 58, 138, 0.6)"
+													: "rgba(219, 234, 254, 0.8)"
+												: isDarkMode
+												? "#1F2937"
+												: "#FFFFFF",
+									}}
+								>
+									<Text
+										style={{
+											color:
+												selectedSection === section
+													? isDarkMode
+														? "#60A5FA"
+														: "#1E40AF"
+													: isDarkMode
+													? "#9CA3AF"
+													: "#6B7280",
+											fontWeight:
+												selectedSection === section ? "600" : "normal",
+										}}
+									>
+										{section}
+									</Text>
+								</View>
+							</TouchableOpacity>
+						))}
+					</ScrollView>
+				</View>
 			</View>
 
-			{/* Filter Controls */}
+			{/* Filter Controls - Redesigned */}
 			<View
-				className="flex-row justify-between items-center px-4 py-2 border-b"
+				className="flex-row justify-between items-center px-4 py-3 border-b"
 				style={{ backgroundColor: cardBackgroundColor, borderColor }}
 			>
-				<TouchableOpacity
-					onPress={toggleVehicleTypeFilter}
-					className="flex-row items-center px-3 py-1 rounded-full"
-					style={{ backgroundColor: filterBgColor }}
+				<Text
+					className="text-sm font-medium"
+					style={{ color: textSecondaryColor }}
 				>
-					<Filter size={16} color={filterTextColor} />
-					<Text style={{ marginLeft: 4, color: filterTextColor, fontSize: 12 }}>
-						{activeFilters.vehicleType === "all"
-							? "All Types"
-							: activeFilters.vehicleType === "compact"
-							? "Compact"
-							: activeFilters.vehicleType === "standard"
-							? "Standard"
-							: "Large"}
-					</Text>
-				</TouchableOpacity>
+					Filters
+				</Text>
+				<View className="flex-row">
+					<TouchableOpacity
+						onPress={toggleVehicleTypeFilter}
+						className="flex-row items-center px-3 py-2 mr-2 rounded-lg"
+						style={{
+							backgroundColor: isDarkMode ? "#1E3A8A" : "#EFF6FF",
+							borderWidth: 1,
+							borderColor: isDarkMode ? "#60A5FA" : "#DBEAFE",
+						}}
+					>
+						<Filter size={14} color={isDarkMode ? "#60A5FA" : "#1E40AF"} />
+						<Text
+							style={{
+								marginLeft: 4,
+								color: isDarkMode ? "#60A5FA" : "#1E40AF",
+								fontSize: 12,
+								fontWeight: "500",
+							}}
+						>
+							{activeFilters.vehicleType === "all"
+								? "All Types"
+								: activeFilters.vehicleType === "compact"
+								? "Compact"
+								: activeFilters.vehicleType === "standard"
+								? "Standard"
+								: "Large"}
+						</Text>
+					</TouchableOpacity>
 
-				<TouchableOpacity
-					onPress={toggleDistanceFilter}
-					className="flex-row items-center px-3 py-1 rounded-full"
-					style={{ backgroundColor: filterBgColor }}
-				>
-					<MapIcon size={16} color={filterTextColor} />
-					<Text style={{ marginLeft: 4, color: filterTextColor, fontSize: 12 }}>
-						{activeFilters.maxDistance === 100
-							? "Any Distance"
-							: `≤ ${activeFilters.maxDistance}m`}
-					</Text>
-				</TouchableOpacity>
+					<TouchableOpacity
+						onPress={toggleDistanceFilter}
+						className="flex-row items-center px-3 py-2 rounded-lg"
+						style={{
+							backgroundColor: isDarkMode ? "#1E3A8A" : "#EFF6FF",
+							borderWidth: 1,
+							borderColor: isDarkMode ? "#60A5FA" : "#DBEAFE",
+						}}
+					>
+						<MapIcon size={14} color={isDarkMode ? "#60A5FA" : "#1E40AF"} />
+						<Text
+							style={{
+								marginLeft: 4,
+								color: isDarkMode ? "#60A5FA" : "#1E40AF",
+								fontSize: 12,
+								fontWeight: "500",
+							}}
+						>
+							{activeFilters.maxDistance === 100
+								? "Any Distance"
+								: `≤ ${activeFilters.maxDistance}m`}
+						</Text>
+					</TouchableOpacity>
+				</View>
 			</View>
 
-			{/* Map Controls */}
+			{/* Map Controls - Redesigned */}
 			<View
-				className="absolute top-20 right-4 z-10 rounded-lg shadow-md"
-				style={{ backgroundColor: controlsBgColor }}
+				className="absolute bottom-4 right-4 z-10 rounded-lg shadow-md overflow-hidden"
+				style={{
+					backgroundColor: controlsBgColor,
+					borderWidth: 1,
+					borderColor: isDarkMode ? "#4B5563" : "#E5E7EB",
+				}}
 			>
 				<TouchableOpacity
 					onPress={increaseZoom}
 					className="p-2 border-b"
 					style={{ borderColor }}
 				>
-					<ZoomIn size={20} color={controlsIconColor} />
+					<ZoomIn size={18} color={isDarkMode ? "#60A5FA" : "#3B82F6"} />
 				</TouchableOpacity>
 				<TouchableOpacity onPress={decreaseZoom} className="p-2">
-					<ZoomOut size={20} color={controlsIconColor} />
+					<ZoomOut size={18} color={isDarkMode ? "#60A5FA" : "#3B82F6"} />
 				</TouchableOpacity>
 			</View>
 
-			{/* Parking Map */}
+			{/* Parking Map - Enhanced */}
 			<ScrollView className="flex-1 p-4">
 				<View
 					className="rounded-lg p-4 shadow-sm"
-					style={{ backgroundColor: cardBackgroundColor }}
+					style={{
+						backgroundColor: cardBackgroundColor,
+						borderWidth: 1,
+						borderColor: isDarkMode ? "#374151" : "#F3F4F6",
+					}}
 				>
-					<View className="flex-row justify-between items-center mb-4">
-						<Text className="text-lg font-bold" style={{ color: textColor }}>
-							{selectedFloor} - {selectedSection}
-						</Text>
-						<View className="flex-row items-center">
-							<View
-								className="w-3 h-3 rounded-full mr-1"
-								style={{ backgroundColor: availableColor }}
-							/>
+					<View className="flex-row justify-between items-center mb-5">
+						<View>
+							<Text className="text-lg font-bold" style={{ color: textColor }}>
+								{selectedFloor}
+							</Text>
 							<Text
-								className="text-xs mr-3"
-								style={{ color: textSecondaryColor }}
+								className="text-sm"
+								style={{ color: isDarkMode ? "#9CA3AF" : "#6B7280" }}
 							>
-								Available
+								{selectedSection}
 							</Text>
-							<View
-								className="w-3 h-3 rounded-full mr-1"
-								style={{ backgroundColor: occupiedColor }}
-							/>
-							<Text className="text-xs" style={{ color: textSecondaryColor }}>
-								Occupied
-							</Text>
+						</View>
+						<View
+							className="flex-row items-center px-3 py-1.5 rounded-lg"
+							style={{ backgroundColor: isDarkMode ? "#1E3A8A" : "#EFF6FF" }}
+						>
+							<View className="flex-row items-center mr-3">
+								<View
+									className="w-3 h-3 rounded-full mr-2"
+									style={{ backgroundColor: availableColor }}
+								/>
+								<Text
+									className="text-xs font-medium"
+									style={{ color: isDarkMode ? "#93C5FD" : "#1E40AF" }}
+								>
+									Available
+								</Text>
+							</View>
+							<View className="flex-row items-center">
+								<View
+									className="w-3 h-3 rounded-full mr-2"
+									style={{ backgroundColor: occupiedColor }}
+								/>
+								<Text
+									className="text-xs font-medium"
+									style={{ color: isDarkMode ? "#93C5FD" : "#1E40AF" }}
+								>
+									Occupied
+								</Text>
+							</View>
 						</View>
 					</View>
 
@@ -386,30 +550,37 @@ const ParkingMap = ({
 						</View>
 					)}
 
-					{/* Parking slots grid */}
+					{/* Parking slots grid - with subtle background pattern */}
 					<View
-						style={{
-							transform: [{ scale: zoomLevel }],
-							flexDirection: "row",
-							flexWrap: "wrap",
-							justifyContent: "space-evenly",
-							alignItems: "center",
-							padding: 5,
-						}}
+						className="rounded-lg overflow-hidden"
+						style={{ backgroundColor: isDarkMode ? "#111827" : "#F9FAFB" }}
 					>
-						{filteredSlotData.map((slot) => (
-							<ParkingSlot
-								key={slot.id}
-								id={slot.id}
-								slotNumber={slot.slotNumber}
-								isAvailable={slot.isAvailable}
-								vehicleType={slot.vehicleType}
-								distanceToEntrance={slot.distanceToEntrance}
-								onSelect={handleSlotSelect}
-								isSelected={selectedSlot === slot.id}
-								isDarkMode={isDarkMode}
-							/>
-						))}
+						<View className="p-2">
+							<View
+								style={{
+									transform: [{ scale: zoomLevel }],
+									flexDirection: "row",
+									flexWrap: "wrap",
+									justifyContent: "space-evenly",
+									alignItems: "center",
+									padding: 5,
+								}}
+							>
+								{filteredSlotData.map((slot) => (
+									<ParkingSlot
+										key={slot.id}
+										id={slot.id}
+										slotNumber={slot.slotNumber}
+										isAvailable={slot.isAvailable}
+										vehicleType={slot.vehicleType}
+										distanceToEntrance={slot.distanceToEntrance}
+										onSelect={handleSlotSelect}
+										isSelected={selectedSlot === slot.id}
+										isDarkMode={isDarkMode}
+									/>
+								))}
+							</View>
+						</View>
 					</View>
 				</View>
 			</ScrollView>

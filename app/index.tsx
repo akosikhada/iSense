@@ -1,24 +1,36 @@
-import React, { useState, useContext, useMemo, useCallback } from "react";
+import React, {
+	useState,
+	useContext,
+	useMemo,
+	useCallback,
+	useEffect,
+} from "react";
 import {
 	View,
 	Text,
 	ScrollView,
 	SafeAreaView,
 	TouchableOpacity,
+	Alert,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Car, Info } from "lucide-react-native";
+import { useRouter } from "expo-router";
 
 // Import components
 import Header from "./components/Header";
 import NavigationBar from "./components/NavigationBar";
 import ParkingMap from "./components/ParkingMap";
 import ParkingAssistant from "./components/ParkingAssistant";
-import { ThemeContext } from "./preferences";
+import { ThemeContext } from "./ThemeContext";
+import NotificationService from "./components/NotificationService";
+import SoundService from "./components/SoundService";
+import VibrationService from "./components/VibrationService";
 
 function HomeScreen() {
 	const insets = useSafeAreaInsets();
 	const { isDarkMode } = useContext(ThemeContext);
+	const router = useRouter();
 	const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
 	const [showParkingAssistant, setShowParkingAssistant] = useState(false);
 	const [alignmentStatus, setAlignmentStatus] =
@@ -27,6 +39,37 @@ function HomeScreen() {
 		vehicleType: "all" as "compact" | "standard" | "large" | "all",
 		maxDistance: 100,
 	});
+	const [notificationCount, setNotificationCount] = useState(0);
+
+	// Initialize services and load notification count
+	useEffect(() => {
+		const initServices = async () => {
+			try {
+				// Initialize all services
+				await NotificationService.initNotifications();
+				await SoundService.initAudio();
+				await VibrationService.initVibration();
+
+				// Load notification count
+				const unreadCount = await NotificationService.getUnreadCount();
+				setNotificationCount(unreadCount);
+			} catch (error) {
+				console.error("Failed to initialize services:", error);
+			}
+		};
+
+		initServices();
+
+		// Update notification count periodically
+		const interval = setInterval(async () => {
+			const count = await NotificationService.getUnreadCount();
+			setNotificationCount(count);
+		}, 10000); // Check every 10 seconds
+
+		return () => {
+			clearInterval(interval);
+		};
+	}, []);
 
 	// Define theme colors as memoized values
 	const themeColors = useMemo(
@@ -66,6 +109,16 @@ function HomeScreen() {
 	const handleParkingCancel = useCallback(() => {
 		setShowParkingAssistant(false);
 	}, []);
+
+	// Handle notification button press
+	const handleNotificationsPress = useCallback(() => {
+		router.push("/notifications");
+	}, [router]);
+
+	// Handle settings button press
+	const handleSettingsPress = useCallback(() => {
+		router.push("/preferences");
+	}, [router]);
 
 	// Memoize the ParkingMap component to prevent unnecessary rerenders
 	const memoizedParkingMap = useMemo(
@@ -128,8 +181,9 @@ function HomeScreen() {
 		>
 			<Header
 				title="Parking Assistant"
-				onNotificationsPress={() => console.log("Notifications pressed")}
-				onSettingsPress={() => console.log("Settings pressed")}
+				onNotificationsPress={handleNotificationsPress}
+				onSettingsPress={handleSettingsPress}
+				notificationCount={notificationCount}
 			/>
 
 			<ScrollView
@@ -138,88 +192,96 @@ function HomeScreen() {
 				showsVerticalScrollIndicator={true}
 			>
 				<View className="p-4">
-					{/* Welcome message */}
-					<View
-						className="p-4 rounded-lg mb-4"
-						style={{ backgroundColor: themeColors.welcomeBgColor }}
-					>
-						<View className="flex-row items-start">
-							<Info
-								size={20}
-								color={themeColors.infoIconColor}
-								className="mr-2 mt-0.5"
-							/>
-							<Text style={{ color: themeColors.welcomeTextColor, flex: 1 }}>
-								Welcome to the Intelligent Parking Assistant. Find available
-								parking slots and get real-time alignment guidance.
-							</Text>
-						</View>
-					</View>
-
 					{/* Parking availability summary */}
 					<View
-						className="p-4 rounded-lg shadow-sm mb-4"
+						className="p-5 rounded-lg shadow-sm mb-4"
 						style={{ backgroundColor: themeColors.cardBackgroundColor }}
 					>
 						<Text
-							className="text-lg font-bold mb-2"
+							className="text-lg font-bold mb-3"
 							style={{ color: themeColors.textColor }}
 						>
 							Parking Availability
 						</Text>
 						<View className="flex-row justify-between">
-							<View className="items-center">
+							<View
+								className="flex-1 px-3 py-3 mr-2 rounded-lg flex-row items-center"
+								style={{ backgroundColor: isDarkMode ? "#064E3B" : "#ECFDF5" }}
+							>
 								<View
-									className="w-10 h-10 rounded-full items-center justify-center mb-1"
+									className="w-10 h-10 rounded-full items-center justify-center mr-3"
 									style={{ backgroundColor: themeColors.statBgGreen }}
 								>
 									<Text
-										className="font-bold"
+										className="font-bold text-base"
 										style={{ color: themeColors.statTextGreen }}
 									>
 										12
 									</Text>
 								</View>
-								<Text
-									className="text-sm"
-									style={{ color: themeColors.textSecondaryColor }}
-								>
-									Available
-								</Text>
+								<View>
+									<Text
+										className="text-sm font-semibold mb-0.5"
+										style={{ color: themeColors.statTextGreen }}
+									>
+										Available
+									</Text>
+									<Text
+										className="text-xs"
+										style={{ color: isDarkMode ? "#6EE7B7" : "#047857" }}
+									>
+										Ready to park
+									</Text>
+								</View>
 							</View>
-							<View className="items-center">
+							<View
+								className="flex-1 px-3 py-3 rounded-lg flex-row items-center"
+								style={{ backgroundColor: isDarkMode ? "#7F1D1D" : "#FEF2F2" }}
+							>
 								<View
-									className="w-10 h-10 rounded-full items-center justify-center mb-1"
+									className="w-10 h-10 rounded-full items-center justify-center mr-3"
 									style={{ backgroundColor: themeColors.statBgRed }}
 								>
 									<Text
-										className="font-bold"
+										className="font-bold text-base"
 										style={{ color: themeColors.statTextRed }}
 									>
 										8
 									</Text>
 								</View>
-								<Text
-									className="text-sm"
-									style={{ color: themeColors.textSecondaryColor }}
-								>
-									Occupied
-								</Text>
-							</View>
-							<View className="items-center">
-								<View
-									className="w-10 h-10 rounded-full items-center justify-center mb-1"
-									style={{ backgroundColor: themeColors.statBgBlue }}
-								>
-									<Car size={18} color={themeColors.statIconBlue} />
+								<View>
+									<Text
+										className="text-sm font-semibold mb-0.5"
+										style={{ color: themeColors.statTextRed }}
+									>
+										Occupied
+									</Text>
+									<Text
+										className="text-xs"
+										style={{ color: isDarkMode ? "#FCA5A5" : "#B91C1C" }}
+									>
+										In use now
+									</Text>
 								</View>
-								<Text
-									className="text-sm"
-									style={{ color: themeColors.textSecondaryColor }}
-								>
-									Your Car
-								</Text>
 							</View>
+						</View>
+
+						<View
+							className="flex-row items-center mt-3 pt-3 border-t"
+							style={{ borderColor: isDarkMode ? "#374151" : "#E5E7EB" }}
+						>
+							<View
+								className="w-8 h-8 rounded-full items-center justify-center mr-2"
+								style={{ backgroundColor: themeColors.statBgBlue }}
+							>
+								<Car size={16} color={themeColors.statIconBlue} />
+							</View>
+							<Text
+								className="text-sm"
+								style={{ color: themeColors.textSecondaryColor }}
+							>
+								Your vehicle is currently not parked
+							</Text>
 						</View>
 					</View>
 
