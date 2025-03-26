@@ -10,7 +10,10 @@ import { useEffect, useContext } from "react";
 import "react-native-reanimated";
 import "../global.css";
 import { Platform, useColorScheme } from "react-native";
-import { ThemeContext, ThemeProvider } from "./preferences";
+import { ThemeContext, ThemeProvider } from "./ThemeContext";
+import SoundService from "./services/SoundService";
+import VibrationService from "./components/VibrationService";
+import NotificationService from "./components/NotificationService";
 
 // Define theme objects
 const LightTheme = {
@@ -54,6 +57,50 @@ export default function RootLayout() {
 			SplashScreen.hideAsync();
 		}
 	}, [loaded]);
+
+	// Initialize sound system and other services when app loads
+	useEffect(() => {
+		const initializeServices = async () => {
+			try {
+				// Initialize the audio system with error handling
+				await SoundService.initAudio().catch((err) => {
+					console.warn("Audio initialization warning:", err);
+				});
+
+				await SoundService.initSounds().catch((err) => {
+					console.warn("Sound initialization warning:", err);
+				});
+
+				// Initialize vibration system
+				await VibrationService.initVibration().catch((err) => {
+					console.warn("Vibration initialization warning:", err);
+				});
+
+				// Initialize notifications system
+				await NotificationService.initNotifications().catch((err) => {
+					console.warn("Notifications initialization warning:", err);
+				});
+
+				console.log("App services initialization completed");
+			} catch (error) {
+				console.error("Failed to initialize app services:", error);
+				// App continues to work without these services
+			}
+		};
+
+		initializeServices();
+
+		// Clean up sound resources when app unmounts
+		return () => {
+			try {
+				SoundService.unloadAllSounds().catch((err) => {
+					console.warn("Error unloading sounds:", err);
+				});
+			} catch (error) {
+				console.warn("Error in sound cleanup:", error);
+			}
+		};
+	}, []);
 
 	if (!loaded) {
 		return null;

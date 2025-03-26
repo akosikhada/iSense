@@ -2,7 +2,7 @@ import React, { useContext, useCallback } from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import { useRouter, usePathname } from "expo-router";
 import { Home, Settings, Bell } from "lucide-react-native";
-import { ThemeContext } from "../preferences";
+import { ThemeContext } from "../ThemeContext";
 
 interface NavigationBarProps {
 	activeTab?: string;
