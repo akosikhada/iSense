@@ -1,50 +1,49 @@
-# Welcome to your Expo app 👋
+# 🚗 Parking Slot Detector 🅿️
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+<div align="center">
 
-## Get started
+[![React Native](https://img.shields.io/badge/React%20Native-0.76-blue.svg)](https://reactnative.dev/)
+[![Expo](https://img.shields.io/badge/Expo-52.0-black.svg)](https://expo.dev/)
+[![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.4-38bdf8.svg)](https://tailwindcss.com/)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-1. Install dependencies
+</div>
 
-   ```bash
-   npm install
-   ```
+## 📋 Overview
 
-2. Start the app
+The Parking Slot Detector is a sophisticated mobile application built with React Native and Expo that revolutionizes parking experiences. Using advanced technologies, the application helps drivers locate, navigate to, and align with available parking spaces efficiently.
 
-   ```bash
-    npx expo start
-   ```
+## ✨ Features
 
-In the output, you'll find options to open the app in a
+- 🗺️ **Real-time Parking Map**: Interactive visualization of available parking spaces across multiple floors and sections
+- 🚘 **Smart Slot Detection**: Advanced algorithms to identify suitable parking spaces based on vehicle size
+- 🎯 **Parking Assistant**: Guided parking with real-time alignment feedback
+- 🏢 **Multi-floor Navigation**: Seamless navigation across different parking levels
+- 🔔 **Notification System**: Alerts and updates about parking availability and changes
+- ⚙️ **Customizable Settings**: User preference controls for notifications, sounds, and vibrations
+- 🌓 **Dark/Light Mode**: Adaptive theme options for different lighting conditions
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+## 🛠️ Technology Stack
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+- 📱 **Framework**: React Native with Expo
+- 🎨 **UI Styling**: TailwindCSS (NativeWind)
+- 🧭 **Navigation**: Expo Router (file-based routing)
+- 🔄 **State Management**: React Context API
+- 🔣 **Icons**: Lucide React Native
+- 🔊 **Audio & Haptics**: Expo AV and Haptics
+- 📐 **Styling**: Responsive design with SafeAreaContext
 
-## Get a fresh project
+## 📜 License
 
-When you're ready, run:
+This project is licensed under the MIT License - see the LICENSE file for details.
 
-```bash
-npm run reset-project
-```
+---
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+<div align="center">
 
-## Learn more
+### Built with passion and expertise by
 
-To learn more about developing your project with Expo, look at the following resources:
+[![akosikhada](https://img.shields.io/badge/GitHub-akosikhada-000000)](https://github.com/akosikhada)
+[![znarf-y](https://img.shields.io/badge/GitHub-znarf--y-000000)](https://github.com/znarf-y)
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+</div>
