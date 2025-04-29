@@ -1,4 +1,4 @@
-# 🚗 Parking Slot Detector 🅿️
+# 🚗 iSense 🅿️
 
 <div align="center">
 
@@ -11,7 +11,7 @@
 
 ## 📋 Overview
 
-The Parking Slot Detector is a sophisticated mobile application built with React Native and Expo that revolutionizes parking experiences. Using advanced technologies, the application helps drivers locate, navigate to, and align with available parking spaces efficiently.
+iSense is a smart parking app that helps drivers find available spaces quickly. Using computer vision technology, it guides users to suitable parking spots based on vehicle size, provides real-time navigation across multiple levels, and offers a seamless payment experience.
 
 ## ✨ Features
 
@@ -37,13 +37,21 @@ The Parking Slot Detector is a sophisticated mobile application built with React
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
+## 👥 Developer/s
+
+<table align="center">
+  <tr>
+    <td align="center">
+      <b>Miguel Enrique Dasalla</b>
+      <br />
+      Full-Stack Developer
+    </td>
+    <td align="center">
+      <b>Franz Jeremy Señora</b>
+      <br />
+      Full-Stack Developer
+    </td>
+  </tr>
+</table>
+
 ---
-
-<div align="center">
-
-### Built with passion and expertise by
-
-[![akosikhada](https://img.shields.io/badge/GitHub-akosikhada-000000)](https://github.com/akosikhada)
-[![znarf-y](https://img.shields.io/badge/GitHub-znarf--y-000000)](https://github.com/znarf-y)
-
-</div>

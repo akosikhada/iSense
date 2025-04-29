@@ -27,7 +27,7 @@
         <category android:name="android.intent.category.DEFAULT"/>
         <category android:name="android.intent.category.BROWSABLE"/>
         <data android:scheme="myapp"/>
-        <data android:scheme="com.syvexa.testtempo"/>
+        <data android:scheme="com.syvexa.isense"/>
       </intent-filter>
     </activity>
   </application>
