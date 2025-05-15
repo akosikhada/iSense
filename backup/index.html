@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iSense Parking System</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="logo.png">
+</head>
+<body>
+    <!-- Site blocker - shows when terms haven't been accepted -->
+    <div id="site-blocker" class="site-blocker">
+        <div class="site-blocker-message">
+            <p>Please accept the Terms and Conditions to access the system.</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <header>
+            <div class="logo">
+                <div class="logo-icon">
+                    <img src="logo.png" alt="iSense Logo">
+                </div>
+                <span>iSense Parking System</span>
+            </div>
+        </header>
+        
+        <div id="notification" class="notification hidden">
+            <div class="notification-icon">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM13 17H11V15H13V17ZM13 13H11V7H13V13Z" fill="currentColor"/>
+                </svg>
+            </div>
+            <div class="notification-content">
+                <h3 id="notification-title">Parking Status</h3>
+                <p id="notification-message">All parking slots are currently occupied.</p>
+            </div>
+            <button id="notification-close" class="notification-close">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z" fill="currentColor"/>
+                </svg>
+            </button>
+        </div>
+        
+        <div class="feature-cards">
+            <div class="feature-card">
+                <h3>Be space ready</h3>
+                <div id="slot-count" class="slot-display">--</div>
+                <p>Available parking slots ready for your vehicle</p>
+            </div>
+            
+            <div class="feature-card">
+                <h3>Be alignment ready</h3>
+                <div id="alignment-status" class="alignment-display">Not Connected</div>
+                <p>Perfect your parking position with real-time guidance</p>
+            </div>
+        </div>
+        
+        <div class="visualization">
+            <h2>Live Parking Map</h2>
+            <div class="parking-lot">
+                <div class="parking-space" id="space-1">1</div>
+                <div class="parking-space" id="space-2">2</div>
+                <div class="parking-space" id="space-3">3</div>
+                <div class="parking-space" id="space-4">4</div>
+            </div>
+        </div>
+        
+        <div class="connection">
+            <p>Connection Status: <span id="connection-status">Disconnected</span></p>
+            <button id="connect-btn">Connect Device</button>
+        </div>
+        
+        <div class="footer">
+            <button id="terms-btn" class="terms-btn">Terms and Conditions</button>
+        </div>
+    </div>
+    
+    <!-- Terms and Conditions Modal -->
+    <div id="terms-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Terms and Conditions</h2>
+                <button id="close-modal" class="close-modal" style="display: none;">&times;</button>
+            </div>
+            <div class="modal-body">
+                <h3>Intelligent Parking Slot Optimization and Misalignment Detection System</h3>
+                <p>Last Updated: April 16, 2025</p>
+
+                <h3>1. Acceptance of Terms</h3>
+                <p>By accessing or using the "Intelligent Parking Slot Optimization and Misalignment Detection System" (hereinafter referred to as the "System"), you (hereinafter referred to as the "User") agree to be bound by these Terms and Conditions (hereinafter referred to as the "Terms"). If you do not agree to these Terms, you may not access or use the System.</p>
+                
+                <h3>2. Description of the System</h3>
+                <p>The System is designed to optimize parking slot allocation and detect vehicle misalignment within designated parking areas. This may include features such as:</p>
+                <ul>
+                    <li>Real-time parking slot availability information.</li>
+                    <li>Automated assignment of parking slots.</li>
+                    <li>Detection of vehicles parked outside designated slot boundaries.</li>
+                    <li>Data collection and analysis related to parking usage.</li>
+                </ul>
+                
+                <h3>3. User Responsibilities</h3>
+                <p>By using the System, the User agrees to:</p>
+                <ul>
+                    <li>Comply with all posted signs, instructions, and regulations within the parking area.</li>
+                    <li>Park their vehicle within the designated parking slot boundaries.</li>
+                    <li>Operate their vehicle safely and responsibly within the parking area.</li>
+                    <li>Provide accurate information when required by the System.</li>
+                    <li>Not interfere with the proper functioning of the System's hardware or software.</li>
+                    <li>Be aware that the System is an aid and does not guarantee perfect parking or prevent all parking-related incidents.</li>
+                    <li>Assume full responsibility for any damage caused to their vehicle or other property while using the parking facility.</li>
+                </ul>
+                
+                <h3>4. System Availability and Maintenance</h3>
+                <ul>
+                    <li>The System is provided on an "as is" and "as available" basis.</li>
+                    <li>We strive to maintain the System's availability but do not guarantee uninterrupted access.</li>
+                    <li>We reserve the right to suspend, modify, or discontinue the System (or any part thereof) at any time without prior notice for maintenance, upgrades, or other reasons.</li>
+                    <li>We will not be liable for any loss or inconvenience resulting from the System's unavailability.</li>
+                </ul>
+                
+                <h3>5. Data Collection and Privacy</h3>
+                <ul>
+                    <li>The System may collect data related to parking usage, such as vehicle entry and exit times and parking duration.</li>
+                    <li>Any personal data collected will be handled in accordance with our Privacy Policy, which will be made available separately.</li>
+                    <li>By using the System, you consent to the collection and processing of such data as outlined in the Privacy Policy.</li>
+                    <li>Republic Act No. 10173, Data Privacy Act of 2012 (DPA): This is the primary law governing the collection, processing, storage, and disposal of personal data in the Philippines.</li>
+                </ul>
+                
+                <h3>6. Intellectual Property</h3>
+                <ul>
+                    <li>The System, including its software, algorithms, design, and any associated materials, are protected by intellectual property rights owned by iSense or its licensors.</li>
+                    <li>Users are granted a non-exclusive, non-transferable, and limited license to use the System for its intended purpose.</li>
+                    <li>Users shall not copy, modify, distribute, reverse engineer, or attempt to extract the source code of the System without explicit written permission.</li>
+                </ul>
+                
+                <h3>7. Disclaimer of Warranties</h3>
+                <p>THE SYSTEM IS PROVIDED "AS IS" WITHOUT ANY WARRANTIES, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT.</p>
+                <p>WE DO NOT WARRANT THAT THE SYSTEM WILL BE ERROR-FREE, SECURE, OR UNINTERRUPTED.</p>
+                <p>WE DO NOT WARRANT THE ACCURACY OR COMPLETENESS OF THE INFORMATION PROVIDED BY THE SYSTEM.</p>
+                
+                <h3>8. Limitation of Liability</h3>
+                <p>TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, iSense AND ITS AFFILIATES, OFFICERS, DIRECTORS, EMPLOYEES, AND AGENTS SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES (INCLUDING, WITHOUT LIMITATION, DAMAGES FOR LOSS OF PROFITS, DATA, USE, GOODWILL, OR OTHER INTANGIBLE LOSSES) ARISING OUT OF OR RELATING TO YOUR USE OF OR INABILITY TO USE THE SYSTEM, EVEN IF WE HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.</p>
+                <p>OUR TOTAL LIABILITY TO YOU FOR ANY CLAIM ARISING OUT OF OR RELATING TO THESE TERMS OR THE SYSTEM SHALL NOT EXCEED PHP 100.00.</p>
+                
+                <h3>9. Indemnification</h3>
+                <p>You agree to indemnify and hold harmless iSense and its affiliates, officers, directors, employees, and agents from and against any and all claims, liabilities, damages, losses, costs, and expenses (including reasonable attorneys' fees) arising out of or relating to your use of the System, your violation of these Terms, or your violation of any rights of a third party.</p>
+                
+                <h3>10. Governing Law and Dispute Resolution</h3>
+                <ul>
+                    <li>These Terms shall be governed by and construed in accordance with the laws of the Republic of the Philippines (Republic Act No. 8293, Intellectual Property Code of the Philippines).</li>
+                    <li>Any dispute arising out of or relating to these Terms or the System shall be subject to the exclusive jurisdiction of the courts of Quezon City, Metro Manila, Philippines.</li>
+                </ul>
+                
+                <h3>11. Modifications to the Terms</h3>
+                <p>We reserve the right to modify these Terms at any time without prior notice. Any changes will be effective immediately upon posting the updated Terms within the System or on our website. Your continued use of the System after the posting of revised Terms constitutes your acceptance of the changes. It is your responsibility to review these Terms periodically for any updates.</p>
+                
+                <h3>12. Severability</h3>
+                <p>If any provision of these Terms is held to be invalid or unenforceable, such provision shall be struck and the remaining provisions shall remain in full force and effect.</p>
+                
+                <h3>13. Entire Agreement</h3>
+                <p>These Terms constitute the entire agreement between you and iSense regarding your use of the System and supersede all prior or contemporaneous communications and proposals, whether oral or written.</p>
+                
+                <h3>14. Contact Information</h3>
+                <p>If you have any questions or concerns regarding these Terms or the System, please contact us at:</p>
+                <p>iSense<br>
+                673 Quirino Hwy, Novaliches, Quezon City, Metro Manila<br>
+                isenseparkingsystem@gmail.com<br>
+                (02) 8806 3049</p>
+            </div>
+            <div class="modal-footer">
+                <div class="terms-agreement">
+                    <input type="checkbox" id="terms-checkbox">
+                    <label for="terms-checkbox">By ticking, you are confirming that you have read, understood and agree to Intelligent Parking Slot Optimization and Misalignment Detection System terms and conditions.</label>
+                </div>
+                <button id="accept-terms" class="accept-btn">I Accept</button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,57 +1,60 @@
-# 🚗 iSense 🅿️
+# iSense Parking System
 
-<div align="center">
+An intelligent parking system that helps monitor parking spaces and guide vehicles to align properly.
 
-[![React Native](https://img.shields.io/badge/React%20Native-0.76-blue.svg)](https://reactnative.dev/)
-[![Expo](https://img.shields.io/badge/Expo-52.0-black.svg)](https://expo.dev/)
-[![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.4-38bdf8.svg)](https://tailwindcss.com/)
-[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+## Project Components
 
-</div>
+- **Web Interface**: User-facing application for monitoring parking
+- **Arduino**: Controls hardware components (sensors, servos, LCD)
+- **ESP32**: Acts as a bridge between Arduino and web interface
 
-## 📋 Overview
+## Deployment Options
 
-iSense is a smart parking app that helps drivers find available spaces quickly. Using computer vision technology, it guides users to suitable parking spots based on vehicle size, provides real-time navigation across multiple levels, and offers a seamless payment experience.
+### Local Development
+1. Connect Arduino + ESP32 to your computer
+2. Upload the Arduino code (`arduino/arduino.ino`)
+3. Upload the ESP32 code (`arduino/esp.ino`)
+4. Open `index.html` in your browser
+5. Connect using Web Serial API (Chrome/Edge only)
 
-## ✨ Features
+### Deploying to Vercel
 
-- 🗺️ **Real-time Parking Map**: Interactive visualization of available parking spaces across multiple floors and sections
-- 🚘 **Smart Slot Detection**: Advanced algorithms to identify suitable parking spaces based on vehicle size
-- 🎯 **Parking Assistant**: Guided parking with real-time alignment feedback
-- 🏢 **Multi-floor Navigation**: Seamless navigation across different parking levels
-- 🔔 **Notification System**: Alerts and updates about parking availability and changes
-- ⚙️ **Customizable Settings**: User preference controls for notifications, sounds, and vibrations
-- 🌓 **Dark/Light Mode**: Adaptive theme options for different lighting conditions
+1. Sign up or log in to [Vercel](https://vercel.com/)
+2. Install Vercel CLI: `npm i -g vercel`
+3. Run `vercel login` in your terminal
+4. Navigate to your project directory
+5. Run `vercel` and follow the prompts
+6. Your site will be deployed to a URL like `your-project-name.vercel.app`
 
-## 🛠️ Technology Stack
+### Deploying to Netlify
 
-- 📱 **Framework**: React Native with Expo
-- 🎨 **UI Styling**: TailwindCSS (NativeWind)
-- 🧭 **Navigation**: Expo Router (file-based routing)
-- 🔄 **State Management**: React Context API
-- 🔣 **Icons**: Lucide React Native
-- 🔊 **Audio & Haptics**: Expo AV and Haptics
-- 📐 **Styling**: Responsive design with SafeAreaContext
+1. Sign up or log in to [Netlify](https://www.netlify.com/)
+2. Click "New site from Git"
+3. Connect to your Git repository
+4. Select your repository
+5. Keep the default settings and click "Deploy site"
+6. Your site will be deployed to a URL like `your-site-name.netlify.app`
 
-## 📜 License
+## ESP32 Connection
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+For deployed websites, use the ESP32-compatible version:
 
-## 👥 Developer/s
+1. Use `index-esp32.html` and `script-esp32.js` instead of the standard files
+2. Make sure your ESP32 is connected to your WiFi network
+3. Note the ESP32's IP address from the serial monitor
+4. When accessing the deployed site, enter this IP address to connect
 
-<table align="center">
-  <tr>
-    <td align="center">
-      <b>Miguel Enrique Dasalla</b>
-      <br />
-      Full-Stack Developer
-    </td>
-    <td align="center">
-      <b>Franz Jeremy Señora</b>
-      <br />
-      Full-Stack Developer
-    </td>
-  </tr>
-</table>
+## CORS Considerations
 
----
+If your deployed website can't connect to your ESP32, you may need to enable CORS on your ESP32:
+
+```cpp
+// Add these lines to the setup() function in esp.ino
+server.enableCORS(true);
+```
+
+## Troubleshooting
+
+- **Can't connect to ESP32**: Make sure your ESP32 and device are on the same network or that you've set up proper port forwarding
+- **ESP32 not visible**: Check your router's DHCP settings to assign a static IP to your ESP32
+- **Connection errors**: Try using an incognito/private browsing window to avoid cached issues 
